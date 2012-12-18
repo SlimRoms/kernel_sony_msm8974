@@ -879,8 +879,8 @@ static int get_simultaneous_batt_v_and_i(struct qpnp_bms_chip *chip,
 
 static int estimate_ocv(struct qpnp_bms_chip *chip)
 {
-	int ibat_ua, vbat_uv, ocv_est_uv;
-	int rc;
+	int ibat_ua =  0, vbat_uv = 0, ocv_est_uv = 0;
+	int rc = 0;
 	int rbatt_mohm = chip->default_rbatt_mohm + chip->r_conn_mohm
 					+ chip->rbatt_capacitive_mohm;
 
@@ -1471,7 +1471,7 @@ static int get_prop_bms_current_now(struct qpnp_bms_chip *chip)
 /* Returns coulomb counter in uAh */
 static int get_prop_bms_charge_counter(struct qpnp_bms_chip *chip)
 {
-	int64_t cc_raw;
+	int64_t cc_raw = 0;
 
 	mutex_lock(&chip->bms_output_lock);
 	lock_output_data(chip);
@@ -1485,7 +1485,7 @@ static int get_prop_bms_charge_counter(struct qpnp_bms_chip *chip)
 /* Returns shadow coulomb counter in uAh */
 static int get_prop_bms_charge_counter_shadow(struct qpnp_bms_chip *chip)
 {
-	int64_t cc_raw;
+	int64_t cc_raw = 0;
 
 	mutex_lock(&chip->bms_output_lock);
 	lock_output_data(chip);
@@ -1605,8 +1605,8 @@ static int stop_ocv_updates(struct qpnp_bms_chip *chip)
 
 static int reset_bms_for_test(struct qpnp_bms_chip *chip)
 {
-	int ibat_ua = 0, vbat_uv = 0, rc;
-	int ocv_est_uv;
+	int ibat_ua = 0, vbat_uv = 0, rc = 0;
+	int ocv_est_uv = 0;
 
 	if (!chip) {
 		pr_err("BMS driver has not been initialized yet!\n");
@@ -2169,7 +2169,7 @@ out:
 
 static int clamp_soc_based_on_voltage(struct qpnp_bms_chip *chip, int soc)
 {
-	int rc, vbat_uv;
+	int rc = 0, vbat_uv = 0;
 
 	rc = get_battery_voltage(chip, &vbat_uv);
 	if (rc < 0) {
@@ -2190,7 +2190,7 @@ static int clamp_soc_based_on_voltage(struct qpnp_bms_chip *chip, int soc)
 static int clamp_soc_based_on_voltage_with_max_count(struct qpnp_bms_chip *chip,
 							int soc)
 {
-	int rc, vbat_uv;
+	int rc = 0, vbat_uv = 0;
 	bool force = false;
 	int new_soc = soc;
 	struct qpnp_somc_params *sp = &chip->somc_params;
@@ -2231,7 +2231,7 @@ out:
 
 static int64_t convert_cc_uah_to_raw(struct qpnp_bms_chip *chip, int64_t cc_uah)
 {
-	int64_t cc_uv, cc_pvh, cc_raw;
+	int64_t cc_uv = 0, cc_pvh = 0, cc_raw = 0;
 
 	cc_pvh = cc_uah * chip->r_sense_uohm;
 	cc_uv = div_s64(cc_pvh * SLEEP_CLK_HZ * SECONDS_PER_HOUR,
@@ -2250,7 +2250,7 @@ static void configure_soc_wakeup(struct qpnp_bms_chip *chip,
 	int target_ocv_uv;
 	int64_t target_cc_uah, cc_raw_64, current_shdw_cc_raw_64;
 	int64_t current_shdw_cc_uah, iadc_comp_factor;
-	uint64_t cc_raw, current_shdw_cc_raw;
+	uint64_t cc_raw = 0, current_shdw_cc_raw = 0;
 	int16_t ocv_raw, current_ocv_raw;
 
 	current_shdw_cc_raw = 0;
@@ -2504,8 +2504,8 @@ done_calculating:
 
 static int calculate_soc_from_voltage(struct qpnp_bms_chip *chip)
 {
-	int voltage_range_uv, voltage_remaining_uv, voltage_based_soc;
-	int rc, vbat_uv;
+	int voltage_range_uv = 0, voltage_remaining_uv = 0, voltage_based_soc = 0;
+	int rc = 0, vbat_uv = 0;
 
 	rc = get_battery_voltage(chip, &vbat_uv);
 	if (rc < 0) {
@@ -2751,9 +2751,9 @@ static void configure_vbat_monitor_high(struct qpnp_bms_chip *chip)
 static void btm_notify_vbat(enum qpnp_tm_state state, void *ctx)
 {
 	struct qpnp_bms_chip *chip = ctx;
-	int vbat_uv;
+	int vbat_uv = 0;
 	struct qpnp_vadc_result result;
-	int rc;
+	int rc = 0;
 
 	rc = qpnp_vadc_read(chip->vadc_dev, VBAT_SNS, &result);
 	pr_debug("vbat = %lld, raw = 0x%x\n", result.physical, result.adc_code);
