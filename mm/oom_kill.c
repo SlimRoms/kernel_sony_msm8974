@@ -102,7 +102,6 @@ static bool has_intersects_mems_allowed(struct task_struct *start,
 	struct task_struct *tsk;
 	bool ret = false;
 
-	rcu_read_lock();
 	for_each_thread(start, tsk) {
 		if (mask) {
 			/*
@@ -119,10 +118,7 @@ static bool has_intersects_mems_allowed(struct task_struct *start,
 			 */
 			ret = cpuset_mems_allowed_intersects(current, tsk);
 		}
-		if (ret)
-			break;
 	}
-	rcu_read_unlock();
 
 	return ret;
 }
@@ -144,8 +140,6 @@ struct task_struct *find_lock_task_mm(struct task_struct *p)
 {
 	struct task_struct *t;
 
-	rcu_read_lock();
-
 	for_each_thread(p, t) {
 		task_lock(t);
 		if (likely(t->mm))
@@ -153,9 +147,9 @@ struct task_struct *find_lock_task_mm(struct task_struct *p)
 		task_unlock(t);
 	}
 	t = NULL;
-found:
+	
+ found:
 	rcu_read_unlock();
-
 	return t;
 }
 
@@ -362,14 +356,11 @@ static struct task_struct *select_bad_process(unsigned int *ppoints,
 			break;
 		};
 		points = oom_badness(p, NULL, nodemask, totalpages);
-		if (!points || points < chosen_points)
-			continue;
-		/* Prefer thread group leaders for display purposes */
-		if (points == chosen_points && thread_group_leader(chosen))
-			continue;
-
-		chosen = p;
-		chosen_points = points;
+		
+		if (points > chosen_points) {
+			chosen = p;
+			chosen_points = points;
+		}
 	}
 	if (chosen)
 		get_task_struct(chosen);
