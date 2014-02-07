@@ -312,7 +312,7 @@ static void bif_enter_irq_mode_work(struct work_struct *work)
 	struct delayed_work *dwork = to_delayed_work(work);
 	struct bif_ctrl_dev *bdev
 		= container_of(dwork, struct bif_ctrl_dev, enter_irq_mode_work);
-	int rc, i;
+	int rc = 0, i;
 
 	mutex_lock(&bdev->mutex);
 	for (i = 0; i < BIF_TRANSACTION_RETRY_COUNT; i++) {
@@ -582,7 +582,7 @@ static int _bif_slave_write(struct bif_slave_dev *sdev, u16 addr, u8 *buf,
 static int _bif_slave_masked_write(struct bif_slave_dev *sdev, u16 addr, u8 val,
 			u8 mask)
 {
-	int rc;
+	int rc = 0;
 	u8 reg;
 
 	rc = _bif_slave_read(sdev, addr, &reg, 1);
@@ -617,7 +617,7 @@ static int _bif_check_task(struct bif_slave_dev *sdev, unsigned int task)
 
 static int _bif_task_is_busy(struct bif_slave_dev *sdev, unsigned int task)
 {
-	int rc;
+	int rc = 0;
 	u16 addr;
 	u8 reg = 0;
 
@@ -641,7 +641,7 @@ static int _bif_task_is_busy(struct bif_slave_dev *sdev, unsigned int task)
 
 static int _bif_enable_auto_task(struct bif_slave_dev *sdev, unsigned int task)
 {
-	int rc;
+	int rc = 0;
 	u16 addr;
 	u8 mask;
 
@@ -682,7 +682,7 @@ static int _bif_enable_auto_task(struct bif_slave_dev *sdev, unsigned int task)
 
 static int _bif_disable_auto_task(struct bif_slave_dev *sdev, unsigned int task)
 {
-	int rc;
+	int rc = 0;
 	u16 addr;
 	u8 mask;
 
@@ -900,7 +900,7 @@ static int bif_check_task(struct bif_slave *slave, unsigned int task)
 int bif_request_irq(struct bif_slave *slave, unsigned int task,
 			struct notifier_block *nb)
 {
-	int rc;
+	int rc = 0;
 	u16 addr;
 	u8 reg, mask;
 
@@ -997,7 +997,7 @@ EXPORT_SYMBOL(bif_request_irq);
 int bif_free_irq(struct bif_slave *slave, unsigned int task,
 			struct notifier_block *nb)
 {
-	int rc;
+	int rc = 0;
 	u16 addr;
 	u8 reg;
 
@@ -1053,7 +1053,7 @@ EXPORT_SYMBOL(bif_free_irq);
  */
 int bif_trigger_task(struct bif_slave *slave, unsigned int task)
 {
-	int rc;
+	int rc = 0;
 	u16 addr;
 	u8 reg;
 
@@ -1093,7 +1093,7 @@ EXPORT_SYMBOL(bif_trigger_task);
  */
 int bif_enable_auto_task(struct bif_slave *slave, unsigned int task)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave)) {
 		pr_err("Invalid slave pointer=%ld\n", PTR_ERR(slave));
@@ -1122,7 +1122,7 @@ EXPORT_SYMBOL(bif_enable_auto_task);
  */
 int bif_disable_auto_task(struct bif_slave *slave, unsigned int task)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave)) {
 		pr_err("Invalid slave pointer=%ld\n", PTR_ERR(slave));
@@ -1148,7 +1148,7 @@ EXPORT_SYMBOL(bif_disable_auto_task);
  */
 int bif_task_is_busy(struct bif_slave *slave, unsigned int task)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave)) {
 		pr_err("Invalid slave pointer=%ld\n", PTR_ERR(slave));
@@ -1381,7 +1381,7 @@ EXPORT_SYMBOL(bif_ctrl_signal_battery_changed);
  */
 int bif_ctrl_notifier_register(struct bif_ctrl *ctrl, struct notifier_block *nb)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl))
 		return -EINVAL;
@@ -1405,7 +1405,7 @@ EXPORT_SYMBOL(bif_ctrl_notifier_register);
 int bif_ctrl_notifier_unregister(struct bif_ctrl *ctrl,
 				 struct notifier_block *nb)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl))
 		return -EINVAL;
@@ -1932,7 +1932,7 @@ int bif_object_write(struct bif_slave *slave, u8 type, u8 version,
 	struct bif_object *object;
 	struct bif_object *tail_object;
 	struct bif_nvm_function	*nvm;
-	int rc;
+	int rc = 0;
 	int add_null = 0;
 	u16 offset = 0;
 	u8 *buf;
@@ -2084,7 +2084,7 @@ int bif_object_overwrite(struct bif_slave *slave,
 {
 	struct bif_object *edit_object = NULL;
 	struct bif_nvm_function *nvm;
-	int rc;
+	int rc = 0;
 	u16 crc;
 	u8 *buf;
 
@@ -2193,7 +2193,7 @@ int bif_object_delete(struct bif_slave *slave, const struct bif_object *object)
 	struct bif_nvm_function *nvm;
 	bool found = false;
 	int pos = 0;
-	int rc;
+	int rc = 0;
 	u8 *buf;
 
 	if (IS_ERR_OR_NULL(slave) || IS_ERR_OR_NULL(object)) {
@@ -2286,7 +2286,7 @@ EXPORT_SYMBOL(bif_object_delete);
  */
 int bif_slave_read(struct bif_slave *slave, u16 addr, u8 *buf, int len)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave) || IS_ERR_OR_NULL(buf)) {
 		pr_err("Invalid pointer input.\n");
@@ -2316,7 +2316,7 @@ EXPORT_SYMBOL(bif_slave_read);
  */
 int bif_slave_write(struct bif_slave *slave, u16 addr, u8 *buf, int len)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave) || IS_ERR_OR_NULL(buf)) {
 		pr_err("Invalid pointer input.\n");
@@ -2385,7 +2385,7 @@ EXPORT_SYMBOL(bif_slave_nvm_raw_read);
 int bif_slave_nvm_raw_write(struct bif_slave *slave, u16 offset, u8 *buf,
 				int len)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave)) {
 		pr_err("Invalid slave pointer=%ld\n", PTR_ERR(slave));
@@ -2440,7 +2440,7 @@ EXPORT_SYMBOL(bif_slave_is_present);
  */
 int bif_slave_is_selected(struct bif_slave *slave)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave)) {
 		pr_err("Invalid pointer input.\n");
@@ -2471,7 +2471,7 @@ EXPORT_SYMBOL(bif_slave_is_selected);
  */
 int bif_slave_select(struct bif_slave *slave)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(slave)) {
 		pr_err("Invalid pointer input.\n");
@@ -2508,7 +2508,7 @@ EXPORT_SYMBOL(bif_slave_select);
  */
 int bif_ctrl_raw_transaction(struct bif_ctrl *ctrl, int transaction, u8 data)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl)) {
 		pr_err("Invalid pointer input.\n");
@@ -2553,7 +2553,7 @@ EXPORT_SYMBOL(bif_ctrl_raw_transaction);
 int bif_ctrl_raw_transaction_read(struct bif_ctrl *ctrl, int transaction,
 					u8 data, int *response)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl) || IS_ERR_OR_NULL(response)) {
 		pr_err("Invalid pointer input.\n");
@@ -2598,7 +2598,7 @@ EXPORT_SYMBOL(bif_ctrl_raw_transaction_read);
 int bif_ctrl_raw_transaction_query(struct bif_ctrl *ctrl, int transaction,
 		u8 data, bool *query_response)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl) || IS_ERR_OR_NULL(query_response)) {
 		pr_err("Invalid pointer input.\n");
@@ -2679,7 +2679,7 @@ EXPORT_SYMBOL(bif_ctrl_bus_unlock);
  */
 int bif_ctrl_measure_rid(struct bif_ctrl *ctrl)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl)) {
 		pr_err("Invalid controller handle.\n");
@@ -2712,7 +2712,7 @@ EXPORT_SYMBOL(bif_ctrl_measure_rid);
  */
 int bif_ctrl_get_bus_period(struct bif_ctrl *ctrl)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl)) {
 		pr_err("Invalid controller handle.\n");
@@ -2744,7 +2744,7 @@ EXPORT_SYMBOL(bif_ctrl_get_bus_period);
  */
 int bif_ctrl_set_bus_period(struct bif_ctrl *ctrl, int period_ns)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl)) {
 		pr_err("Invalid controller handle.\n");
@@ -2775,7 +2775,7 @@ EXPORT_SYMBOL(bif_ctrl_set_bus_period);
  */
 int bif_ctrl_get_bus_state(struct bif_ctrl *ctrl)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl)) {
 		pr_err("Invalid controller handle.\n");
@@ -2799,7 +2799,7 @@ EXPORT_SYMBOL(bif_ctrl_get_bus_state);
  */
 int bif_ctrl_set_bus_state(struct bif_ctrl *ctrl, enum bif_bus_state state)
 {
-	int rc;
+	int rc = 0;
 
 	if (IS_ERR_OR_NULL(ctrl)) {
 		pr_err("Invalid controller handle.\n");
@@ -3534,7 +3534,7 @@ static int bif_add_known_slaves_from_dt(struct bif_ctrl_dev *bdev,
 					struct device_node *of_node)
 {
 	int len = 0;
-	int rc, i;
+	int rc = 0, i;
 	u32 addr;
 	const __be32 *val;
 
@@ -3580,7 +3580,7 @@ out:
  */
 static int bif_assign_slave_dev_addr(struct bif_slave_dev *sdev, u8 dev_addr)
 {
-	int rc;
+	int rc = 0;
 	u16 addr;
 
 	if (!sdev->protocol_function) {
@@ -3725,7 +3725,7 @@ struct bif_ctrl_dev *bif_ctrl_register(struct bif_ctrl_desc *bif_desc,
 	struct bif_slave_dev *sdev;
 	bool battery_present = false;
 	bool slaves_present = false;
-	int rc, rid_ohm;
+	int rc = 0, rid_ohm;
 
 	if (!bif_desc) {
 		pr_err("Invalid bif_desc specified\n");

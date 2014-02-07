@@ -4111,7 +4111,7 @@ static int __devinit clearpad_probe(struct platform_device *pdev)
 	int rc;
 	bool retry = false;
 #ifdef CONFIG_TOUCHSCREEN_CLEARPAD_RMI_DEV
-	struct platform_device *rmi_dev;
+	struct platform_device *rmi_dev = NULL;
 #endif
 
 	this = kzalloc(sizeof(struct synaptics_clearpad), GFP_KERNEL);

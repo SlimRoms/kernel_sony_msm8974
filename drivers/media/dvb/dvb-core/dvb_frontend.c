@@ -1476,7 +1476,7 @@ static int set_delivery_system(struct dvb_frontend *fe, u32 desired_system)
 
 		/* Check if the desired delivery system is supported */
 		ncaps = 0;
-		while (fe->ops.delsys[ncaps] && ncaps < MAX_DELSYS) {
+		while (fe->ops.delsys[ncaps] && ncaps < MAX_DELSYS-1) {
 			if (fe->ops.delsys[ncaps] == desired_system) {
 				c->delivery_system = desired_system;
 				dprintk("%s() Changing delivery system to %d\n",

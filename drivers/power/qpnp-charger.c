@@ -5281,7 +5281,7 @@ static ssize_t qpnp_chg_param_show(struct device *dev,
 	const ptrdiff_t off = attr - qpnp_chg_attrs;
 	struct qpnp_chg_chip *chip = dev_get_drvdata(dev);
 	u8 reg;
-	int data;
+	int data = 0;
 
 	switch (off) {
 	case BAT_FET_STATUS:
