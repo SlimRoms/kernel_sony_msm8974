@@ -41,7 +41,7 @@ static unsigned int cached_regs[] = {6, 6, 0, 0, 0, 0, 0, 0, 0, 0,
 
 static unsigned int *cache_select(unsigned int reg)
 {
-	unsigned int *out;
+	unsigned int *out = 0;
 
         switch (reg) {
                 case TAIKO_A_RX_HPH_L_GAIN:
