@@ -1987,6 +1987,12 @@ config MSM_CPU_FREQ_MIN
 	depends on MSM_CPU_FREQ_SET_MIN_MAX
 	default 245760
 
+config CPU_OC
+	bool "allow 2.26 GHz max freq option"
+	default n
+	help
+	  Force the PVS bin speed selection to 1, allowing 2.26GHz maximum frequencies
+
 endif # CPU_FREQ_MSM
 
 config MSM_DEVFREQ_CPUBW
