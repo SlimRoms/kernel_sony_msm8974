@@ -8,8 +8,8 @@ echo 'exporting Arch'
 export SUBARCH=arm
 echo 'exporting SubArch'
 #export CROSS_COMPILE=/home/prbassplayer/Honami/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.7/bin/arm-linux-androideabi-
-export CROSS_COMPILE=/home/prbassplayer/WIP4.4/prebuilt/linux-x86/toolchain/linaro-4.7-13.04/bin/arm-linux-gnueabihf-
-#export CROSS_COMPILE=/home/prbassplayer/WIP4.4/prebuilt/linux-x86/toolchain/linaro-4.8-13.06/bin/arm-linux-gnueabihf-
+#export CROSS_COMPILE=/home/prbassplayer/WIP4.4/prebuilt/linux-x86/toolchain/linaro-4.7-13.04/bin/arm-linux-gnueabihf-
+export CROSS_COMPILE=/home/prbassplayer/WIP4.4/prebuilt/linux-x86/toolchain/linaro-4.8-13.06/bin/arm-linux-gnueabihf-
 echo 'exporting Cross Compile'
 
 # Make sure build is clean!
