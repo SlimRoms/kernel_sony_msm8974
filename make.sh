@@ -18,9 +18,19 @@ make clean
 
 # Generates a new .config and exists
 if [ "$1" = "config" ] ; then
-echo 'Making defconfig for Honami'
+if [ "$2" = "amami" ] ; then
+echo 'Making defconfig for amami'
+make slim_rhine_"$2"_row_defconfig
+exit
+elif [ "$2" = "togari" ] ; then
+echo 'Making defconfig for togari'
+make slim_rhine_"$2"_row_defconfig
+exit
+else
+echo 'Making defconfig for honami'
 make slim_rhine_honami_row_defconfig
 exit
+fi
 fi
 
 # Exports kernel local version? Not sure yet.
