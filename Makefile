@@ -576,6 +576,7 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning,array-bounds)
 endif
 ifdef CONFIG_CC_OPTIMIZE_ALOT
 KBUILD_CFLAGS	+= -O3
+KBUILD_CFLAGS	+= $(call cc-disable-warning,array-bounds)
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
