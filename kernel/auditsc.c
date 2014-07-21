@@ -852,7 +852,7 @@ static int audit_filter_rules(struct task_struct *tsk,
 static enum audit_state audit_filter_task(struct task_struct *tsk, char **key)
 {
 	struct audit_entry *e;
-	enum audit_state   state;
+	enum audit_state   state = 0;
 
 	rcu_read_lock();
 	list_for_each_entry_rcu(e, &audit_filter_list[AUDIT_FILTER_TASK], list) {
@@ -878,7 +878,7 @@ static enum audit_state audit_filter_syscall(struct task_struct *tsk,
 					     struct list_head *list)
 {
 	struct audit_entry *e;
-	enum audit_state state;
+	enum audit_state state = 0;
 
 	if (audit_pid && tsk->tgid == audit_pid)
 		return AUDIT_DISABLED;
@@ -1075,7 +1075,7 @@ static inline struct audit_context *audit_alloc_context(enum audit_state state)
 int audit_alloc(struct task_struct *tsk)
 {
 	struct audit_context *context;
-	enum audit_state     state;
+	enum audit_state     state = 0;
 	char *key = NULL;
 
 	if (likely(!audit_ever_enabled))
@@ -1792,7 +1792,7 @@ void __audit_syscall_entry(int arch, int major,
 {
 	struct task_struct *tsk = current;
 	struct audit_context *context = tsk->audit_context;
-	enum audit_state     state;
+	enum audit_state     state = 0;
 
 	if (!context)
 		return;
