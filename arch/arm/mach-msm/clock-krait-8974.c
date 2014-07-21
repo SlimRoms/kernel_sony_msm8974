@@ -598,11 +598,11 @@ static int clock_krait_8974_driver_probe(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct clk *c;
-	int speed, pvs, pvs_ver, config_ver, rows, cpu;
-	unsigned long *freq, cur_rate, aux_rate;
-	int *uv, *ua;
-	u32 *dscr, vco_mask, config_val;
-	int ret;
+	int speed = 0, pvs = 0, pvs_ver = 0, config_ver = 0, rows = 0, cpu = 0;
+	unsigned long *freq = 0, cur_rate = 0, aux_rate = 0;
+	int *uv = 0, *ua = 0;
+	u32 *dscr = 0, vco_mask = 0, config_val = 0;
+	int ret = 0;
 
 	vdd_l2.regulator[0] = devm_regulator_get(dev, "l2-dig");
 	if (IS_ERR(vdd_l2.regulator[0])) {
