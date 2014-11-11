@@ -349,7 +349,7 @@ static ssize_t sound_reg_read_show(struct kobject *kobj,
 		return -1;
 	else
 		return sprintf(buf, "%u\n",
-			tabla_read(fauxsound_codec_ptr, selected_reg));
+			taiko_read(fauxsound_codec_ptr, selected_reg));
 }
 
 static ssize_t sound_reg_write_store(struct kobject *kobj,
@@ -360,7 +360,7 @@ static ssize_t sound_reg_write_store(struct kobject *kobj,
 	sscanf(buf, "%u %u", &out, &chksum);
 	if (calc_checksum(out, 0, chksum)) {
 		if (selected_reg != 0xdeadbeef)
-			tabla_write(fauxsound_codec_ptr, selected_reg, out);
+			taiko_write(fauxsound_codec_ptr, selected_reg, out);
 	}
 	return count;
 }
