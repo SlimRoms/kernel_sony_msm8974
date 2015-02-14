@@ -115,6 +115,13 @@ config LOCALVERSION_AUTO
 
 	  which is done within the script "scripts/setlocalversion".)
 
+config SLIM_EXTRAVERSION
+	bool "Slim Kernel Name"
+	default n
+	help
+	  Enabling this option will add "_SlimLP_x.x" to the localversion.
+	  This should only be enabled for devices that uses slim kernel changes.
+
 config HAVE_KERNEL_GZIP
 	bool
 
