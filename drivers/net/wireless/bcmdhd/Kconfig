@@ -1,32 +1,38 @@
 config BCMDHD
-	tristate "Broadcom FullMAC wireless cards support"
+	tristate "Broadcom 43xx wireless cards support"
+	depends on MMC && CFG80211
 	---help---
 	  This module adds support for wireless adapters based on
-	  Broadcom FullMAC chipset.
-
+	  Broadcom 43xx chipset.
+	  This driver uses the kernel's cfg80211 subsystem.
 	  If you choose to build a module, it'll be called dhd. Say M if
 	  unsure.
 
-config BCMDHD_SDIO
-	bool "SDIO bus interface support"
-	depends on BCMDHD && MMC
-
-config BCMDHD_PCIE
-	bool "PCIe bus interface support"
-	depends on BCMDHD && PCI && !BCMDHD_SDIO
+choice
+	prompt "Select Broadcom wireless card"
+	depends on BCMDHD
+	default BCM4339
 
 config BCM4339
-	tristate "BCM4339 support"
+	bool "Broadcom 4339 wireless card support"
 	depends on BCMDHD
+	---help---
+	  This module adds support for wireless adapters based on
+	  Broadcom 4339 chipset.
 
 config BCM4354
-	tristate "BCM4354 support"
+	bool "Broadcom 4354 wireless card support"
 	depends on BCMDHD
+	---help---
+	  This module adds support for wireless adapters based on
+	  Broadcom 4354 chipset.
+
+endchoice
 
 config BCMDHD_FW_PATH
 	depends on BCMDHD
 	string "Firmware path"
-	default "/system/vendor/firmware/fw_bcmdhd.bin"
+	default "/system/etc/firmware/fw_bcmdhd.bin"
 	---help---
 	  Path to the firmware file.
 
@@ -37,24 +43,16 @@ config BCMDHD_NVRAM_PATH
 	---help---
 	  Path to the calibration file.
 
-config BCMDHD_WEXT
-	bool "Enable WEXT support"
-	depends on BCMDHD && CFG80211 = n
-	select WIRELESS_EXT
-	select WEXT_PRIV
-	help
-	  Enables WEXT support
-
-config DHD_USE_STATIC_BUF
-	bool "Enable memory preallocation"
+config BROADCOM_WIFI_RESERVED_MEM
+	bool "BROADCOM Reserved memory for wifi device"
 	depends on BCMDHD
-	default n
+	default y
 	---help---
-	  Use memory preallocated in platform
+	  This is a configuration for broadcom WLAN driver.
 
-config DHD_USE_SCHED_SCAN
-	bool "Use CFG80211 sched scan"
-	depends on BCMDHD && CFG80211
-	default n
+config BCMDHD_INSMOD_NO_FW_LOAD
+	bool "Disable BROADCOM firmware load"
+	depends on BCMDHD
+	default y
 	---help---
-	  Use CFG80211 sched scan
+	  This is a configuration for broadcom WLAN driver.

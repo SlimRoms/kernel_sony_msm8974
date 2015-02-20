@@ -82,11 +82,7 @@
 #define MSM_MMC_BUS_VOTING_DELAY	200 /* msecs */
 #define INVALID_TUNING_PHASE		-1
 
-#ifdef CONFIG_WIFI_CONTROL_FUNC
-extern int wcf_status_register(
-		void (*cb)(int card_present, void *dev), void *dev);
-extern unsigned int wcf_status(struct device *dev);
-#endif
+#define MSM_SDCC_PM_QOS_TIMEOUT		10000 /* usecs */
 
 #if defined(CONFIG_DEBUG_FS)
 static void msmsdcc_dbg_createhost(struct msmsdcc_host *);
@@ -208,8 +204,9 @@ static void msmsdcc_pm_qos_update_latency(struct msmsdcc_host *host, int vote)
 		pm_qos_update_request(&host->pm_qos_req_dma,
 				host->cpu_dma_latency);
 	else
-		pm_qos_update_request(&host->pm_qos_req_dma,
-					PM_QOS_DEFAULT_VALUE);
+		pm_qos_update_request_timeout(&host->pm_qos_req_dma,
+				host->cpu_dma_latency,
+				MSM_SDCC_PM_QOS_TIMEOUT);
 }
 
 #ifdef CONFIG_MMC_MSM_SPS_SUPPORT
@@ -531,6 +528,11 @@ msmsdcc_request_end(struct msmsdcc_host *host, struct mmc_request *mrq)
 	/* Clear current request information as current request has ended */
 	memset(&host->curr, 0, sizeof(struct msmsdcc_curr_req));
 
+	if (host->disable_mciclk_pwrsave) {
+		host->disable_mciclk_pwrsave = 0;
+		msmsdcc_set_pwrsave(host->mmc, 1);
+	}
+
 	/*
 	 * Need to drop the host lock here; mmc_request_done may call
 	 * back into the driver...
@@ -703,6 +705,11 @@ msmsdcc_dma_complete_tlet(unsigned long data)
 			memset(&host->curr, 0, sizeof(struct msmsdcc_curr_req));
 			spin_unlock_irqrestore(&host->lock, flags);
 
+			if (host->disable_mciclk_pwrsave) {
+				host->disable_mciclk_pwrsave = 0;
+				msmsdcc_set_pwrsave(host->mmc, 1);
+			}
+
 			mmc_request_done(host->mmc, mrq);
 			return;
 		} else if (mrq->data->stop && ((mrq->sbc && mrq->data->error)
@@ -857,6 +864,11 @@ static void msmsdcc_sps_complete_tlet(unsigned long data)
 			 */
 			memset(&host->curr, 0, sizeof(struct msmsdcc_curr_req));
 			spin_unlock_irqrestore(&host->lock, flags);
+
+			if (host->disable_mciclk_pwrsave) {
+				host->disable_mciclk_pwrsave = 0;
+				msmsdcc_set_pwrsave(host->mmc, 1);
+			}
 
 			mmc_request_done(host->mmc, mrq);
 			return;
@@ -1474,6 +1486,10 @@ msmsdcc_data_err(struct msmsdcc_host *host, struct mmc_data *data,
 	if (host->dummy_52_needed)
 		host->dummy_52_needed = 0;
 
+	if (host->disable_mciclk_pwrsave) {
+		host->disable_mciclk_pwrsave = 0;
+		msmsdcc_set_pwrsave(host->mmc, 1);
+	}
 }
 
 static int
@@ -2327,6 +2343,12 @@ msmsdcc_request(struct mmc_host *mmc, struct mmc_request *mrq)
 			host->curr.use_wr_data_pend = true;
 	}
 
+	if (mrq->cmd->opcode == SD_IO_RW_EXTENDED &&
+		host->plat->use_for_wifi) {
+		host->disable_mciclk_pwrsave = 1;
+		msmsdcc_set_pwrsave(host->mmc, 0);
+	}
+
 	msmsdcc_request_start(host, mrq);
 	spin_unlock_irqrestore(&host->lock, flags);
 	return;
@@ -2338,6 +2360,10 @@ card_ejected:
 	if (mrq->data) {
 		mrq->data->error = -error;
 		mrq->data->bytes_xfered = 0;
+	}
+	if (host->disable_mciclk_pwrsave) {
+		host->disable_mciclk_pwrsave = 0;
+		msmsdcc_set_pwrsave(host->mmc, 1);
 	}
 	mmc_request_done(mmc, mrq);
 }
@@ -5851,12 +5877,10 @@ static struct mmc_platform_data *msmsdcc_populate_pdata(struct device *dev)
 		pdata->nonremovable = true;
 	if (of_get_property(np, "qcom,disable-cmd23", NULL))
 		pdata->disable_cmd23 = true;
-#ifdef CONFIG_WIFI_CONTROL_FUNC
-	if (of_get_property(np, "qcom,wifi-control-func", NULL))
-		pdata->wifi_control_func = true;
-#endif
 	of_property_read_u32(np, "qcom,dat1-mpm-int",
 					&pdata->mpm_sdiowakeup_int);
+	if (of_get_property(np, "somc,use-for-wifi", NULL))
+		pdata->use_for_wifi = true;
 	return pdata;
 err:
 	return NULL;
@@ -6161,6 +6185,15 @@ msmsdcc_probe(struct platform_device *pdev)
 	if (plat->is_sdio_al_client)
 		mmc->pm_flags |= MMC_PM_IGNORE_PM_NOTIFY;
 
+	if (plat->use_for_wifi) {
+#ifdef CONFIG_MACH_SONY_SHINANO
+		plat->register_status_notify = shinano_wifi_status_register;
+		plat->status = shinano_wifi_status;
+#endif
+		mmc->pm_caps |= MMC_PM_IGNORE_PM_NOTIFY;
+		mmc->pm_flags |= mmc->pm_caps;
+	}
+
 	mmc->max_segs = msmsdcc_get_nr_sg(host);
 	mmc->max_blk_size = MMC_MAX_BLK_SIZE;
 	mmc->max_blk_count = MMC_MAX_BLK_CNT;
@@ -6234,15 +6267,6 @@ msmsdcc_probe(struct platform_device *pdev)
 	/*
 	 * Setup card detect change
 	 */
-
-#ifdef CONFIG_WIFI_CONTROL_FUNC
-	pr_info("%s: id %d, nonremovable %d\n", mmc_hostname(mmc),
-			host->pdev->id, plat->nonremovable);
-	if (plat->wifi_control_func) {
-		plat->register_status_notify = wcf_status_register;
-		plat->status = wcf_status;
-	}
-#endif
 
 	if (!plat->status_gpio)
 		plat->status_gpio = -ENOENT;
@@ -6755,6 +6779,8 @@ msmsdcc_runtime_suspend(struct device *dev)
 		if (unlikely(work_busy(&mmc->detect.work))) {
 			rc = -EAGAIN;
 		} else {
+			if (host->plat->use_for_wifi)
+				mmc->pm_flags |= MMC_PM_KEEP_POWER;
 			rc = mmc_suspend_host(mmc);
 		}
 		pm_runtime_put_noidle(dev);

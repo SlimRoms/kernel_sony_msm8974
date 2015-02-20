@@ -741,8 +741,7 @@
 
 &sdcc3 {
 	qcom,sup-voltages = <1800 2950>;
-	qcom,wifi-control-func;
-	qcom,nonremovable;
+	somc,use-for-wifi;
 	status = "ok";
 };
 

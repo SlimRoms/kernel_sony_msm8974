@@ -1,4 +1,6 @@
 /*
+ * Definitions for nl80211 testmode access to host driver
+ *
  * Copyright (C) 1999-2014, Broadcom Corporation
  * 
  *      Unless you and Broadcom execute a separate written software license
@@ -19,30 +21,36 @@
  * software in any way with any other Broadcom software provided under a license
  * other than the GPL, without Broadcom's express prior written consent.
  *
- * $Id: epivers.h.in,v 13.33 2010-09-08 22:08:53 $
+ * $Id: brcm_nl80211.h 454792 2014-02-11 20:40:19Z $
  *
-*/
+ */
 
-#ifndef _epivers_h_
-#define _epivers_h_
+#ifndef _brcm_nl80211_h_
+#define _brcm_nl80211_h_
 
-#define	EPI_MAJOR_VERSION	1
+struct bcm_nlmsg_hdr {
+	uint cmd;	/* common ioctl definition */
+	uint len;	/* attached buffer length */
+	uint offset;	/* user buffer offset */
+	uint set;	/* get or set request optional */
+	uint magic;	/* magic number for verification */
+};
 
-#define	EPI_MINOR_VERSION	141
+enum bcmnl_attrs {
+	BCM_NLATTR_UNSPEC,
 
-#define	EPI_RC_NUMBER		67
+	BCM_NLATTR_LEN,
+	BCM_NLATTR_DATA,
 
-#define	EPI_INCREMENTAL_NUMBER	2
+	__BCM_NLATTR_AFTER_LAST,
+	BCM_NLATTR_MAX = __BCM_NLATTR_AFTER_LAST - 1
+};
 
-#define	EPI_BUILD_NUMBER	0
+struct nl_prv_data {
+	int err;			/* return result */
+	void *data;			/* ioctl return buffer pointer */
+	uint len;			/* ioctl return buffer length */
+	struct bcm_nlmsg_hdr *nlioc;	/* bcm_nlmsg_hdr header pointer */
+};
 
-#define	EPI_VERSION		1, 141, 67, 2
-
-#define	EPI_VERSION_NUM		0x018d4302
-
-#define EPI_VERSION_DEV		1.141.67
-
-/* Driver Version String, ASCII, 32 chars max */
-#define	EPI_VERSION_STR		"1.141.67.2 (r)"
-
-#endif /* _epivers_h_ */
+#endif /* _brcm_nl80211_h_ */
