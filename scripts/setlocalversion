@@ -185,7 +185,7 @@ else
 	if test "${LOCALVERSION+set}" != "set"; then
 		scm=$(scm_version --short)
 		if test "$CONFIG_SLIM_EXTRAVERSION" = "y"; then
-		res="_SlimLP_1.2"
+		res="_SlimLP_1.3"
 		else
 		res="$res"
 		fi
